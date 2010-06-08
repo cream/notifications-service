@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    
+    <head>
+        <title>Cream Notification</title>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        
+        <style type="text/css">
+            body {
+                margin: 0px;
+                padding: 20px;
+
+                font-size: 9pt;
+
+                cursor: default;
+                -webkit-user-select: none;
+
+                font-family: "Sans";
+                font-style: normal;
+                text-shadow: 0px -1px 1px rgba(0, 0, 0, .9);
+                
+                width: 315px;
+            }
+            
+            .cream-notification {
+                width: 275px;
+                padding: 15px;
+                -webkit-box-shadow: 0px 0px 5px rgba(1, 1, 1, .55);
+                
+                border-radius: 8px;
+                background: -webkit-gradient(linear, left top, left bottom, from(rgba(40, 40, 40, .75)), to(rgba(0, 0, 0, .75)));
+                
+               /*border: 1px solid -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 1)), to(rgba(0, 0, 0, 1)));*/
+                
+               /*border: 1px solid rgba(255, 255,255, .05);*/
+                
+                color: #ffffff;
+            }
+
+                .cream-notification .notification-icon {
+                    width: 48px;
+                    padding-right: 10px;
+                }
+                
+                .cream-notification .notification-title {
+                    font-weight: bold;
+                }
+                
+                .cream-notification .notification-descr {
+                    padding-top: 4px;
+                    width: 215px;
+                }
+
+                .cream-notification .notification-left {
+                    float: left;
+                    
+                }
+
+                .cream-notification .notification-right {
+                    float: left;
+                }
+                
+                .close-icon-wrapper {
+                    position: absolute;
+                    right: 21px;
+                    top: 21px;
+                }
+        </style>
+        
+        <script type="text/javascript" src="mootools.js"></script>
+        <script type="text/javascript" src="mootools-more.js"></script>
+        
+        <script type="text/javascript">
+            window.addEvent('domready', function() {
+                data = get_data();
+                $('icon').set('src', data['iconsdsafdsf']);
+                $('title').set('text', data['summary']);
+                $('descr').set('text', data['body']);
+                
+                $('close-icon').fade('hide');
+                $('notification').set('tween', {duration: 150, transition: 'linear'});
+                $('close-icon').set('tween', {duration: 150, transition: 'linear'});
+
+                $('notification').addEvent('mouseover', function() {
+                    $('close-icon').fade('in');
+                    this.fade(0.35);
+                });
+                
+                $('notification').addEvent('mouseout', function() {
+                    $('close-icon').fade('out');
+                    this.fade(1.0);
+                });
+                
+                $('close-icon').addEvent('click', function() {
+                   // hide this notification
+                    hide();
+                });
+            });
+        </script>
+    </head>
+    
+    <body>
+    
+        <div style="padding: 5px; width: 305px;">
+            
+            <div class="close-icon-wrapper" id="close-icon"  style="z-index: 666;">
+                <img src="close.png" />
+            </div>
+                
+            <div class="cream-notification" id="notification">
+                
+                <div class="notification-left">
+                    <div class="notification-icon">
+                        <img src="icon.png" id="icon" />
+                    </div>
+                </div>
+                    
+                <div class="notification-right">
+                    <div class="notification-title" id="title">
+                    </div>
+                    
+                    <div class="notification-descr" id="descr">
+                    </div>
+                </div>
+                 
+                <div style="clear: left;">
+                    
+            </div>
+        </div>
+        
+    </body>
+</html>
