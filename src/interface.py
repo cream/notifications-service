@@ -11,6 +11,7 @@ class NotificationWindow(gobject.GObject):
     __gtype_name__ = 'NotificationWindow'
     __gsignals__ = {
         'closed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, ())
+        'size-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, (gobject.TYPE_INTEGER, gobject.TYPE_INTEGER))
         }
 
     def __init__(self, summary, body, icon):
@@ -60,6 +61,7 @@ class NotificationWindow(gobject.GObject):
                 self._size = (width, height)
                 self.window.set_size_request(width, height)
                 self.window.resize(width, height)
+            self.emit('size-changed', width, height)
 
 
     def set_position(self, x, y):
@@ -68,6 +70,10 @@ class NotificationWindow(gobject.GObject):
 
     def get_position(self, x, y):
         return self.window.get_position()
+
+
+    def get_size(self):
+        return self.window.get_size()
 
 
     def move(self, x, y):
