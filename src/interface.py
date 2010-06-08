@@ -4,6 +4,8 @@ import cairo
 import webkit
 import javascriptcore as jscore
 
+import cream.gui
+
 class NotificationWindow(gobject.GObject):
 
     __gtype_name__ = 'NotificationWindow'
@@ -58,6 +60,27 @@ class NotificationWindow(gobject.GObject):
                 self._size = (width, height)
                 self.window.set_size_request(width, height)
                 self.window.resize(width, height)
+
+
+    def set_position(self, x, y):
+        self.window.move(x, y)
+
+
+    def get_position(self, x, y):
+        return self.window.get_position()
+
+
+    def move(self, x, y):
+
+        def update(timeline, status):
+            self.set_position((x - start_x) * state + start_x, (y - start_y) * state + start_y)
+
+        start_x, start_y = self.get_position()
+
+        t = cream.gui.Timeline(300, cream.gui.CURVE_SINE)
+        t.connect('update', update)
+        t.run()
+
 
     def get_data(self):
 
