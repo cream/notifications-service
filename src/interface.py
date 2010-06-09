@@ -36,6 +36,10 @@ class NotificationWindow(gobject.GObject):
         self.view.set_transparent(True)
         self.view.connect('expose-event', self.resize_cb)
 
+        settings = self.view.get_settings()
+        settings.set_property('enable-universal-access-from-file-uris', True)
+        self.view.set_settings(settings)
+
         self.view.open('file://./interface/notification.html')
 
         self.window.add(self.view)
