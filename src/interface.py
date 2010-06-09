@@ -23,6 +23,7 @@ class NotificationWindow(gobject.GObject):
         self.icon = icon
 
         self.window = gtk.Window()
+        self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_UTILITY)
         self.window.set_skip_pager_hint(True)
         self.window.set_skip_taskbar_hint(True)
         self.window.set_size_request(355, -1)
@@ -50,7 +51,15 @@ class NotificationWindow(gobject.GObject):
 
 
     def show(self):
+
+        def update(timeline, state):
+            self.js_context.document.getElementById('notification').style.opacity = state
+
         self.window.show_all()
+
+        t = cream.gui.Timeline(1000, cream.gui.CURVE_SINE)
+        t.connect('update', update)
+        t.run()
 
 
     def resize_cb(self, widget, event, *args):
@@ -90,7 +99,7 @@ class NotificationWindow(gobject.GObject):
 
         start_x, start_y = self.get_position()
 
-        t = cream.gui.Timeline(300, cream.gui.CURVE_SINE)
+        t = cream.gui.Timeline(500, cream.gui.CURVE_SINE)
         t.connect('update', update)
         t.run()
 
@@ -105,7 +114,19 @@ class NotificationWindow(gobject.GObject):
 
 
     def destroy(self):
-        self.window.destroy()
+
+        def _destroy():
+            self.window.hide()
+            self.window.destroy()
+
+        def update(timeline, state):
+            self.js_context.document.getElementById('notification').style.opacity = 1 - state
+
+        t = cream.gui.Timeline(1000, cream.gui.CURVE_SINE)
+        t.connect('update', update)
+        t.run()
+
+        t.connect('completed', lambda *args: _destroy())
 
 
     def hide(self):
@@ -118,6 +139,3 @@ class NotificationWindow(gobject.GObject):
         ctx.set_operator(cairo.OPERATOR_SOURCE)
         ctx.set_source_rgba(0, 0, 0, 0)
         ctx.fill()
-
-#notif = NotificationWindow('Notification', """Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.""", 'fd')
-#gtk.main()i
