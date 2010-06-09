@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 import gtk
 
 import cream
@@ -9,6 +12,7 @@ from interface import NotificationWindow
 NAME = 'org.cream.notifications.Frontend'
 OBJECT = '/org/cream/notifications/Frontend'
 CAPABILITIES = ()
+ICON_SIZE = (48, 48)
 
 class Service(Frontend, cream.Module):
     def __init__(self):
@@ -23,6 +27,13 @@ class Service(Frontend, cream.Module):
     def sig_size_changed(self, window, width, height):
         self.rearrange()
 
+    def store_icon(self, data):
+        pb = data.to_gtk_pixbuf().scale_simple(ICON_SIZE[0], ICON_SIZE[1], gtk.gdk.INTERP_HYPER)
+        fd, fname = tempfile.mkstemp('.png')
+        os.close(fd)
+        pb.save(fname, 'png')
+        return fname
+
     def rearrange(self, unanimated=[]):
         y = 0
         for window in self.windows:
@@ -34,7 +45,10 @@ class Service(Frontend, cream.Module):
             y += window_height
 
     def sig_show_notification(self, frontend, n):
-        window = NotificationWindow(n.summary, n.body, 'fd')
+        icon_fname = ''
+        if n.image_data is not None:
+            icon_fname = 'file://%s' % self.store_icon(n.image_data)
+        window = NotificationWindow(n.summary, n.body, icon_fname)
         window.notification = n
         window.connect('closed', lambda window: self.delete_notification(n))
         self.windows.append(window)
@@ -48,9 +62,13 @@ class Service(Frontend, cream.Module):
         raise IndexError(n)
 
     def sig_hide_notification(self, frontend, n):
-        window = self.get_window_by_notification(n)
-        window.destroy()
-        self.delete_notification(n)
+        try:
+            window = self.get_window_by_notification(n)
+        except IndexError:
+            pass
+        else:
+            window.destroy()
+            self.delete_notification(n)
 
     def delete_notification(self, n):
         window = self.get_window_by_notification(n)
