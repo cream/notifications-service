@@ -10,8 +10,8 @@ class NotificationWindow(gobject.GObject):
 
     __gtype_name__ = 'NotificationWindow'
     __gsignals__ = {
-        'closed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, ())
-        'size-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, (gobject.TYPE_INTEGER, gobject.TYPE_INTEGER))
+        'closed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, ()),
+        'size-changed': (gobject.SIGNAL_RUN_LAST, gobject.TYPE_PYOBJECT, (gobject.TYPE_INT, gobject.TYPE_INT))
         }
 
     def __init__(self, summary, body, icon):
@@ -23,6 +23,9 @@ class NotificationWindow(gobject.GObject):
         self.icon = icon
 
         self.window = gtk.Window()
+        self.window.set_skip_pager_hint(True)
+        self.window.set_skip_taskbar_hint(True)
+        self.window.set_size_request(355, -1)
         self.window.set_keep_above(True)
         self.window.set_app_paintable(True)
         self.window.connect('expose-event', self.expose_cb)
@@ -36,13 +39,14 @@ class NotificationWindow(gobject.GObject):
         self.view.open('file://./interface/notification.html')
 
         self.window.add(self.view)
-        self.window.show_all()
 
         self.js_context = jscore.JSContext(self.view.get_main_frame().get_global_context()).globalObject
         self.js_context.get_data = self.get_data
         self.js_context.hide = self.hide
 
-        self.window.present()
+
+    def show(self):
+        self.window.show_all()
 
 
     def resize_cb(self, widget, event, *args):
@@ -68,17 +72,16 @@ class NotificationWindow(gobject.GObject):
         self.window.move(x, y)
 
 
-    def get_position(self, x, y):
+    def get_position(self):
         return self.window.get_position()
 
 
     def get_size(self):
         return self.window.get_size()
 
-
     def move(self, x, y):
 
-        def update(timeline, status):
+        def update(timeline, state):
             self.set_position((x - start_x) * state + start_x, (y - start_y) * state + start_y)
 
         start_x, start_y = self.get_position()
@@ -97,11 +100,13 @@ class NotificationWindow(gobject.GObject):
             }
 
 
-    def hide(self):
-        print 'YAAAY'
+    def destroy(self):
         self.window.destroy()
-        self.emit('closed')
 
+
+    def hide(self):
+        self.destroy()
+        self.emit('closed')
 
     def expose_cb(self, window, event):
 
